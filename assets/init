@@ -652,7 +652,7 @@ appStart () {
   # for the database server to come online.
   case "${DB_TYPE}" in
     mysql)
-      prog="mysqladmin -h ${DB_HOST} -P ${DB_PORT} -u ${DB_USER} ${DB_PASS:+-p$DB_PASS} status"
+      prog="netstat -ano|grep ${DB_PORT}|grep LISTEN"
       ;;
     postgres)
       prog=$(find /usr/lib/postgresql/ -name pg_isready)
@@ -661,7 +661,7 @@ appStart () {
   esac
   timeout=60
   printf "Waiting for database server to accept connections"
-  while ! ${prog} >/dev/null 2>&1
+  while [ -z "$prog" ]
   do
     timeout=$(expr $timeout - 1)
     if [ $timeout -eq 0 ]; then
